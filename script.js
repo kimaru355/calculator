@@ -108,6 +108,9 @@ function calculate() {
       break;
     case "%":
       result = number1 % number2;
+      if (isNaN(result)) {
+        result = "ERROR";
+      }
       break;
   }
 }

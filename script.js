@@ -2,7 +2,7 @@ let input = document.querySelector("#input");
 let output = document.querySelector("#output");
 let number1;
 let number2;
-let result;
+let result = "";
 let equation = "";
 let operator = "";
 let fullNumber = "";
@@ -18,49 +18,74 @@ let calculator = (buttonId) => {
   if (buttonId === "C") {
     operator = "";
     equation = "";
+    result = "";
+    fullNumber = "";
     output.textContent = "";
   } else if (buttonId === "=") {
+    if (fullNumber === "") {
+      return;
+    }
     number2 = parseInt(fullNumber);
     fullNumber = "";
     calculate();
-    if (isNaN(result)) {
-      result = "ERROR";
-    }
     output.textContent = result;
+    if (result === "ERROR") {
+      operator = "";
+      equation = "";
+      result = "";
+    }
   } else {
-    equation += buttonId;
     switch (buttonId) {
       case "+":
       case "-":
       case "*":
       case "/":
       case "%":
-        // +
+        if (equation === "") {
+          return;
+        }
+        if (operator !== "" && fullNumber === "") {
+          return;
+        }
         if (operator === "") {
           number1 = parseInt(fullNumber);
           fullNumber = "";
           operator = buttonId;
         } else {
-          result = calculate();
-          if (isNaN(result)) {
-            result = "ERROR";
+          if (result === "") {
+            number2 = parseInt(fullNumber);
+            fullNumber = "";
+            calculate();
+            output.textContent = result;
+            if (result === "ERROR") {
+              operator = "";
+              equation = "";
+            } else {
+              equation = "";
+              equation += result;
+              operator = buttonId;
+              number1 = result;
+              result = "";
+            }
+          } else {
+            number1 = result;
+            operator = buttonId;
+            equation = "";
+            equation += result;
+            result = "";
           }
-          output.textContent = result;
         }
         break;
       default:
-        // 34
-        // 36
         fullNumber += buttonId;
         break;
     }
   }
+  if (buttonId !== "=" && buttonId !== "C") {
+    equation += buttonId;
+  }
   input.textContent = equation;
 };
-
-function sortPriority() {
-  equation = Array.from(equation);
-}
 
 function calculate() {
   switch (operator) {
@@ -74,11 +99,12 @@ function calculate() {
       result = number1 * number2;
       break;
     case "/":
-      if (operands[counter + 1] == 0) {
-        calculated = "ERROR";
+      if (number2 == 0) {
+        result = "ERROR";
         return;
+      } else {
+        result = number1 / number2;
       }
-      result = number1 / number2;
       break;
     case "%":
       result = number1 % number2;
